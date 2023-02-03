@@ -18,7 +18,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Duck Hunt Flutter Game',
+      title: 'Duck Hunter',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.pressStart2pTextTheme(),

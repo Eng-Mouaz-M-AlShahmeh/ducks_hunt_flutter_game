@@ -22,6 +22,7 @@ class AppNotifier extends ChangeNotifier {
   int _scoreDucksLiveCount = 0;
   int _currentWave = 1;
   int _fromWave = 0;
+  bool _gamePause = false;
   bool _gameStart = false;
   bool _gameLoose = false;
   bool _gameWin = false;
@@ -57,6 +58,24 @@ class AppNotifier extends ChangeNotifier {
       restartGame();
       getDucksLevel(context, 0);
     }
+  }
+
+  void pauseGame() {
+    _gamePause = true;
+    _gameStart = false;
+    _gameLoose = false;
+    _gameWin = false;
+    _levelTitleOn = false;
+    notifyListeners();
+  }
+
+  void playGame() {
+    _gamePause = false;
+    _gameStart = true;
+    _gameLoose = false;
+    _gameWin = false;
+    _levelTitleOn = false;
+    notifyListeners();
   }
 
   void checkGameOver(BuildContext context) {
@@ -110,6 +129,7 @@ class AppNotifier extends ChangeNotifier {
     _scoreDucksDeadCount = 0;
     _scoreDucksLiveCount = 0;
     _gameStart = true;
+    _gamePause = false;
     _gameLoose = false;
     _gameWin = false;
     _levelTitleOn = false;
@@ -123,6 +143,15 @@ class AppNotifier extends ChangeNotifier {
   }
 
   void shotGun(BuildContext context, TapUpDetails event) {
+    if(_levelTitleOn == true) {
+      return;
+    }
+    if(_gameLoose == true) {
+      return;
+    }
+    if(_gameWin == true) {
+      return;
+    }
     gunDucks = 0;
     _gunClicked = true;
     notifyListeners();
@@ -147,11 +176,11 @@ class AppNotifier extends ChangeNotifier {
         if ((event.localPosition.dx -
                         num.tryParse('${_gameDucks[i].positionX}')!)
                     .abs() <=
-                150 &&
+                80 &&
             (event.localPosition.dy -
                         num.tryParse('${_gameDucks[i].positionY}')!)
                     .abs() <=
-                150) {
+                80) {
           Helper().playSound(8);
           _gameDucks[i].isDead = true;
           _score =
@@ -281,7 +310,7 @@ class AppNotifier extends ChangeNotifier {
     _gameDog.positionX = 0.0;
     _gameDog.positionY = Helper().maxHeightPosition(context) -
         Helper().maxHeightPosition(context) * 0.18;
-    _positionTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+    _positionTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if ((_gameDog.positionX! -
                   (Helper().maxWidthPosition(context) -
                       Helper().maxWidthPosition(context) / 1.7))
@@ -345,64 +374,64 @@ class AppNotifier extends ChangeNotifier {
           (timer) {
         for (int i = 0; i < _gameDucks.length; i++) {
           if (_gameDucks[i].isDead == true) {
-            _gameDucks[i].positionY = _gameDucks[i].positionY! + 10;
+            _gameDucks[i].positionY = _gameDucks[i].positionY! + 5;
             notifyListeners();
           } else {
             if (_gameDucks[i].currentXMove == '+' &&
                 _gameDucks[i].currentYMove == '+') {
-              if (_gameDucks[i].positionX! + 10 >
+              if (_gameDucks[i].positionX! + 5 >
                   Helper().maxWidthPosition(context) -
                       Helper().maxWidthPosition(context) * 0.1) {
                 _gameDucks[i].currentXMove = '-';
                 notifyListeners();
-              } else if (_gameDucks[i].positionY! + 10 >
+              } else if (_gameDucks[i].positionY! + 5 >
                   Helper().maxHeightPosition(context) -
                       Helper().maxHeightPosition(context) * 0.3) {
                 _gameDucks[i].currentYMove = '-';
                 notifyListeners();
               }
-              _gameDucks[i].positionX = _gameDucks[i].positionX! + 10;
-              _gameDucks[i].positionY = _gameDucks[i].positionY! + 10;
+              _gameDucks[i].positionX = _gameDucks[i].positionX! + 5;
+              _gameDucks[i].positionY = _gameDucks[i].positionY! + 5;
               notifyListeners();
             } else if (_gameDucks[i].currentXMove == '-' &&
                 _gameDucks[i].currentYMove == '-') {
-              if (_gameDucks[i].positionX! - 10 < 0) {
+              if (_gameDucks[i].positionX! - 5 < 0) {
                 _gameDucks[i].currentXMove = '+';
                 notifyListeners();
-              } else if (_gameDucks[i].positionY! - 10 < 0) {
+              } else if (_gameDucks[i].positionY! - 5 < 0) {
                 _gameDucks[i].currentYMove = '+';
                 notifyListeners();
               }
-              _gameDucks[i].positionX = _gameDucks[i].positionX! - 10;
-              _gameDucks[i].positionY = _gameDucks[i].positionY! - 10;
+              _gameDucks[i].positionX = _gameDucks[i].positionX! - 5;
+              _gameDucks[i].positionY = _gameDucks[i].positionY! - 5;
               notifyListeners();
             } else if (_gameDucks[i].currentXMove == '+' &&
                 _gameDucks[i].currentYMove == '-') {
-              if (_gameDucks[i].positionX! + 10 >
+              if (_gameDucks[i].positionX! + 5 >
                   Helper().maxWidthPosition(context) -
                       Helper().maxWidthPosition(context) * 0.1) {
                 _gameDucks[i].currentXMove = '-';
                 notifyListeners();
-              } else if (_gameDucks[i].positionY! - 10 < 0) {
+              } else if (_gameDucks[i].positionY! - 5 < 0) {
                 _gameDucks[i].currentYMove = '+';
                 notifyListeners();
               }
-              _gameDucks[i].positionX = _gameDucks[i].positionX! + 10;
-              _gameDucks[i].positionY = _gameDucks[i].positionY! - 10;
+              _gameDucks[i].positionX = _gameDucks[i].positionX! + 5;
+              _gameDucks[i].positionY = _gameDucks[i].positionY! - 5;
               notifyListeners();
             } else if (_gameDucks[i].currentXMove == '-' &&
                 _gameDucks[i].currentYMove == '+') {
-              if (_gameDucks[i].positionX! - 10 < 0) {
+              if (_gameDucks[i].positionX! - 5 < 0) {
                 _gameDucks[i].currentXMove = '+';
                 notifyListeners();
-              } else if (_gameDucks[i].positionY! + 10 >
+              } else if (_gameDucks[i].positionY! + 5 >
                   Helper().maxHeightPosition(context) -
                       Helper().maxHeightPosition(context) * 0.3) {
                 _gameDucks[i].currentYMove = '-';
                 notifyListeners();
               }
-              _gameDucks[i].positionX = _gameDucks[i].positionX! - 10;
-              _gameDucks[i].positionY = _gameDucks[i].positionY! + 10;
+              _gameDucks[i].positionX = _gameDucks[i].positionX! - 5;
+              _gameDucks[i].positionY = _gameDucks[i].positionY! + 5;
               notifyListeners();
             }
           }
@@ -461,6 +490,7 @@ class AppNotifier extends ChangeNotifier {
   int get scoreDucksLiveCount => _scoreDucksLiveCount;
   int get currentWave => _currentWave;
   int get fromWave => _fromWave;
+  bool get gamePause => _gamePause;
   bool get gameStart => _gameStart;
   bool get gameLoose => _gameLoose;
   bool get gameWin => _gameWin;
